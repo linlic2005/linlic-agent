@@ -1,0 +1,68 @@
+{
+	"name": "linlic-agent",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"description": "基于 Pi Coding Agent 的本地科研研究 Agent MVP package",
+	"keywords": [
+		"pi-package",
+		"research-agent",
+		"linlic-agent"
+	],
+	"workspaces": [
+		"vendor/pi/packages/*",
+		"vendor/pi/packages/coding-agent/examples/extensions/with-deps",
+		"vendor/pi/packages/coding-agent/examples/extensions/custom-provider-anthropic",
+		"vendor/pi/packages/coding-agent/examples/extensions/custom-provider-gitlab-duo",
+		"vendor/pi/packages/coding-agent/examples/extensions/sandbox"
+	],
+	"scripts": {
+		"check": "tsgo --noEmit -p tsconfig.json",
+		"lint": "biome check --write --error-on-warnings src test extensions types",
+		"test": "vitest --run --dir test",
+		"pi:check": "npm run check --prefix vendor/pi",
+		"pi:test:ai": "npm test --workspace @earendil-works/pi-ai"
+	},
+	"pi": {
+		"extensions": [
+			"./extensions"
+		],
+		"skills": [
+			"./skills"
+		],
+		"prompts": [
+			"./prompts"
+		]
+	},
+	"peerDependencies": {
+		"@earendil-works/pi-ai": "*",
+		"@earendil-works/pi-coding-agent": "*",
+		"typebox": "*"
+	},
+	"dependencies": {
+		"pdf-parse": "2.4.5"
+	},
+	"devDependencies": {
+		"@anthropic-ai/sandbox-runtime": "0.0.26",
+		"@biomejs/biome": "2.3.5",
+		"@types/node": "22.19.19",
+		"@typescript/native-preview": "7.0.0-dev.20260120.1",
+		"esbuild": "0.28.0",
+		"husky": "9.1.7",
+		"jiti": "2.7.0",
+		"shx": "0.4.0",
+		"tsx": "4.22.1",
+		"typebox": "1.1.38",
+		"typescript": "5.9.3",
+		"vitest": "3.2.4"
+	},
+	"engines": {
+		"node": ">=22.19.0"
+	},
+	"overrides": {
+		"rimraf": "6.1.2",
+		"gaxios": {
+			"rimraf": "6.1.2"
+		}
+	}
+}

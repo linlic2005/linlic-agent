@@ -1,0 +1,14 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"paths": {
+			"*": ["./*"],
+			"@earendil-works/pi-ai": ["./types/pi-ai.d.ts"],
+			"@earendil-works/pi-coding-agent": ["./types/pi-coding-agent.d.ts"],
+			"typebox": ["./node_modules/typebox"]
+		}
+	},
+	"include": ["src/**/*.ts", "extensions/**/*.ts", "test/**/*.ts", "types/**/*.d.ts"],
+	"exclude": ["node_modules", "dist", "vendor/pi/**/dist"]
+}

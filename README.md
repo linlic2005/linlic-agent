@@ -48,14 +48,14 @@
 从 `linlic-agent` 仓库根目录执行：
 
 ```bash
-pi install -l ./packages/linlic-agent
+pi install -l .
 pi
 ```
 
 开发和本地试运行时，也可以临时加载 package：
 
 ```bash
-./pi-test.sh -e ./packages/linlic-agent
+./pi-test.sh -e .
 ```
 
 进入 Pi 后即可使用 slash command：
@@ -65,8 +65,8 @@ pi
 /paper research_workspace/papers/sample.pdf
 /idea idea="your research idea" limit=10 year_from=2020
 /experiment research_workspace/drafts/experiment-plan.md
-/review research_workspace/drafts/sample-draft.md target="target venue"
-/citation-check research_workspace/drafts/sample-draft.md
+/review research_workspace/drafts/paper.md target="target venue"
+/citation-check research_workspace/drafts/paper.md
 /goal target="revise related work and experiments" draft="research_workspace/drafts/sample-draft.md" max_rounds=3
 ```
 
@@ -107,7 +107,11 @@ export ZOTERO_GROUP_ID=your_zotero_group_id
 ```
 
 ```text
-/review research_workspace/drafts/sample-draft.md target="target venue"
+/review research_workspace/drafts/paper.md target="target venue"
+```
+
+```text
+/citation-check research_workspace/drafts/paper.md
 ```
 
 ```text
@@ -117,52 +121,63 @@ export ZOTERO_GROUP_ID=your_zotero_group_id
 ## 6. 目录结构
 
 ```text
-packages/linlic-agent/
+README.md
+AGENTS.md
+SYSTEM.md
+package.json
+tsconfig.json
+docs/
+  zotero.md
+extensions/
+  workspace.ts
+  report-writer.ts
+  semantic-scholar.ts
+  pdf-extract.ts
+  idea-check.ts
+  review-draft.ts
+  citation-check.ts
+  goal-loop.ts
+  zotero.ts
+prompts/
+  search.md
+  paper.md
+  idea.md
+  experiment.md
+  review.md
+  citation-check.md
+  goal.md
+skills/
+  literature-search/
+  paper-analysis/
+  novelty-check/
+  experiment-critic/
+  peer-review/
+  citation-check/
+  review-revise-loop/
+src/
+  workspace.ts
+  report-writer.ts
+  paper-search.ts
+  paper-analysis.ts
+  idea-check.ts
+  review-draft.ts
+  citation-check.ts
+  goal-loop.ts
+  zotero.ts
+test/
+research_workspace/
+vendor/pi/
   README.md
-  AGENTS.md
-  SYSTEM.md
   package.json
-  tsconfig.json
-  docs/
-    zotero.md
-  extensions/
-    workspace.ts
-    report-writer.ts
-    semantic-scholar.ts
-    pdf-extract.ts
-    idea-check.ts
-    review-draft.ts
-    citation-check.ts
-    goal-loop.ts
-    zotero.ts
-  prompts/
-    search.md
-    paper.md
-    idea.md
-    experiment.md
-    review.md
-    citation-check.md
-    goal.md
-  skills/
-    literature-search/
-    paper-analysis/
-    novelty-check/
-    experiment-critic/
-    peer-review/
-    citation-check/
-    review-revise-loop/
-  src/
-    workspace.ts
-    report-writer.ts
-    paper-search.ts
-    paper-analysis.ts
-    idea-check.ts
-    review-draft.ts
-    citation-check.ts
-    goal-loop.ts
-    zotero.ts
-  test/
+  packages/
+    ai/
+    agent/
+    coding-agent/
+    tui/
+  scripts/
 ```
+
+根目录是 `linlic-agent` 的正式项目边界。Pi Coding Agent 上游源码保留在 `vendor/pi`，用于复用 Pi package、extensions、skills、prompt templates 和本地开发工具链；除非确有必要，不直接修改 `vendor/pi/packages/coding-agent` 核心逻辑。
 
 ## 7. 工作区说明
 
@@ -319,7 +334,7 @@ export ZOTERO_USER_ID=your_zotero_user_id
 export ZOTERO_GROUP_ID=optional_group_id
 ```
 
-详细说明见 `packages/linlic-agent/docs/zotero.md`。
+详细说明见 `docs/zotero.md`。
 
 ## 9. 输出文件说明
 
@@ -375,7 +390,7 @@ research_workspace/reviews/goal-YYYYMMDD-HHmmss/
 
 ### 如何接 Zotero？
 
-配置 `ZOTERO_API_KEY`，再按需要配置 `ZOTERO_USER_ID` 或 `ZOTERO_GROUP_ID`。配置后，`/idea` 和 `/review` 会尝试检索用户 Zotero 文献库；`/search` 的 Top 论文也可以导出为 BibTeX。详细配置见 `packages/linlic-agent/docs/zotero.md`。
+配置 `ZOTERO_API_KEY`，再按需要配置 `ZOTERO_USER_ID` 或 `ZOTERO_GROUP_ID`。配置后，`/idea` 和 `/review` 会尝试检索用户 Zotero 文献库；`/search` 的 Top 论文也可以导出为 BibTeX。详细配置见 `docs/zotero.md`。
 
 ### 如何换模型？
 

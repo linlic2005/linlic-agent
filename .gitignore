@@ -1,0 +1,42 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+*.tsbuildinfo
+# packages/*/node_modules/
+vendor/pi/packages/*/dist/
+vendor/pi/packages/*/dist-chrome/
+vendor/pi/packages/*/dist-firefox/
+*.cpuprofile
+
+# Environment
+.env
+
+# Editor files
+.vscode/
+.zed/
+.idea/
+.claude/
+*.swp
+*.swo
+*~
+
+# Package specific
+.npm/
+.npm-cache/
+coverage/
+.nyc_output/
+.pi_config/
+tui-debug.log
+compaction-results/
+.opencode/
+syntax.jsonl
+out.jsonl
+pi-*.html
+out.html
+vendor/pi/packages/coding-agent/binaries/
+todo.md
+plans/
+vendor/pi/.pi/hf-sessions/
+vendor/pi/.pi/hf-sessions-backup/
+collect.sh
