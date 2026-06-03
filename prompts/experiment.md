@@ -1,6 +1,6 @@
 ---
 description: 模拟审稿人评估实验方案
-argument-hint: "<实验方案文本或文件路径>"
+argument-hint: "<实验方案文件路径或实验方案文本>"
 ---
 你正在执行 linlic-agent 的 `/experiment` 实验方案评估 MVP。
 
@@ -13,7 +13,7 @@ $ARGUMENTS
 请完成：
 
 1. 调用 `research_prepare_workspace`，确认 `research_workspace` 已创建。
-2. 如果用户输入像文件路径，请先使用 Pi 内置 `read` 工具读取文件；如果读取失败，基于用户直接输入继续并说明限制。
+2. 如果用户输入像文件路径，请先使用 Pi 内置 `read` 工具读取文件；否则把 `$ARGUMENTS` 当作实验方案文本。读取失败时，基于用户直接输入继续并说明限制。
 3. 以严厉但建设性的审稿人视角输出 Markdown：
    - `# 实验方案评估报告`
    - 实验目标是否清晰

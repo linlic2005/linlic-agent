@@ -1,6 +1,6 @@
 ---
 description: 对研究想法做 novelty check 和可行性评估
-argument-hint: "<研究想法>"
+argument-hint: 'idea="<研究想法>" limit=10 year_from=2020'
 ---
 你正在执行 linlic-agent 的 `/idea` 研究想法查重与可行性评估 MVP。
 
@@ -14,8 +14,9 @@ $ARGUMENTS
 
 1. 调用 `research_prepare_workspace`，确认 `research_workspace` 已创建。
 2. 调用 `research_check_idea`：
-   - `idea`: 原始用户输入 `$ARGUMENTS`
-   - 如果用户明确给出 `limit` 或 `year_from`，传入对应参数。
+   - `idea`: 原始用户输入 `$ARGUMENTS`；支持 `idea="..."` 或直接位置参数。
+   - `limit`: 如果用户明确给出 `limit`，传入用于检索相似工作的论文数量；默认 10。
+   - `yearFrom`: 如果用户明确给出 `year_from` 或 `yearFrom`，传入最早发表年份。
 3. `research_check_idea` 会先尝试检索用户已配置的 Zotero 文献库；如果 Zotero 未配置或不可用，不要中断流程，继续复用 `/search` 的 Semantic Scholar / OpenAlex / arXiv 检索能力，并输出完整 Markdown 报告。
 4. 检查工具返回的 Markdown 是否包含：
    - `# 研究想法查重与可行性评估报告`

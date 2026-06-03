@@ -3,7 +3,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { parseGoalInput, runGoalReviewLoop } from "../src/goal-loop.ts";
+import { parseGoalInput, runGoalReviewLoop } from "../src/revise-loop.ts";
 
 const incompleteDraft = `
 # Draft
@@ -40,11 +40,11 @@ The method improves robustness.
 [1] PatchCore.
 `;
 
-describe("goal review-revise loop", () => {
-	it("parses goal command arguments and clamps max_rounds", () => {
+describe("revise review-revise loop", () => {
+	it("parses revise command arguments and clamps max_rounds", () => {
 		expect(
 			parseGoalInput(
-				'/goal target="投稿到目标会议，尽量达到 Weak Accept 以上" draft="research_workspace/drafts/paper.md" max_rounds=8',
+				'/revise target="投稿到目标会议，尽量达到 Weak Accept 以上" draft="research_workspace/drafts/paper.md" max_rounds=8',
 			),
 		).toEqual({
 			target: "投稿到目标会议，尽量达到 Weak Accept 以上",
@@ -52,15 +52,21 @@ describe("goal review-revise loop", () => {
 			maxRounds: 6,
 		});
 
-		expect(parseGoalInput('/goal draft="paper.md"')).toEqual({
+		expect(parseGoalInput('/revise draft="paper.md"')).toEqual({
+			target: "未指定目标",
+			draft: "paper.md",
+			maxRounds: 3,
+		});
+
+		expect(parseGoalInput("/revise paper.md")).toEqual({
 			target: "未指定目标",
 			draft: "paper.md",
 			maxRounds: 3,
 		});
 	});
 
-	it("creates a goal run directory, backs up the original draft, and saves every round artifact", async () => {
-		const dir = await mkdtemp(join(tmpdir(), "linlic-goal-loop-"));
+	it("creates a revise run directory, backs up the original draft, and saves every round artifact", async () => {
+		const dir = await mkdtemp(join(tmpdir(), "linlic-revise-loop-"));
 		const draftPath = join(dir, "paper.md");
 		const timestamp = new Date(Date.UTC(2026, 0, 2, 3, 4, 5));
 		await writeFile(draftPath, incompleteDraft, "utf8");
@@ -68,12 +74,12 @@ describe("goal review-revise loop", () => {
 		try {
 			const result = await runGoalReviewLoop({
 				cwd: dir,
-				input: `/goal target="投稿到目标会议，尽量达到 Weak Accept 以上" draft="${draftPath}" max_rounds=2`,
+				input: `/revise target="投稿到目标会议，尽量达到 Weak Accept 以上" draft="${draftPath}" max_rounds=2`,
 				timestamp,
 			});
 
 			expect(result.rounds).toHaveLength(2);
-			expect(result.runDir).toBe(join(dir, "research_workspace", "reviews", "goal-20260102-030405"));
+			expect(result.runDir).toBe(join(dir, "research_workspace", "reviews", "revise-20260102-030405"));
 			expect(readFileSync(draftPath, "utf8")).toBe(incompleteDraft);
 			expect(existsSync(join(result.runDir, "original-draft.md"))).toBe(true);
 			expect(existsSync(join(result.runDir, "config.json"))).toBe(true);
@@ -87,7 +93,7 @@ describe("goal review-revise loop", () => {
 			}
 
 			const summary = readFileSync(join(result.runDir, "final-summary.md"), "utf8");
-			expect(summary).toContain("# Goal Review-Revise Loop Final Summary");
+			expect(summary).toContain("# Review-Revise Loop Final Summary");
 			expect(summary).toContain("总共进行了 2 轮");
 			expect(summary).toContain("当前模拟接收概率");
 		} finally {
@@ -96,14 +102,14 @@ describe("goal review-revise loop", () => {
 	});
 
 	it("enforces the execution max_rounds cap and never writes over the original draft", async () => {
-		const dir = await mkdtemp(join(tmpdir(), "linlic-goal-loop-cap-"));
+		const dir = await mkdtemp(join(tmpdir(), "linlic-revise-loop-cap-"));
 		const draftPath = join(dir, "paper.md");
 		await writeFile(draftPath, incompleteDraft, "utf8");
 
 		try {
 			const result = await runGoalReviewLoop({
 				cwd: dir,
-				input: `/goal target="投稿到目标会议" draft="${draftPath}" max_rounds=999`,
+				input: `/revise target="投稿到目标会议" draft="${draftPath}" max_rounds=999`,
 				majorIssueStopThreshold: 0,
 				timestamp: new Date(Date.UTC(2026, 0, 2, 3, 4, 5)),
 			});
@@ -120,14 +126,14 @@ describe("goal review-revise loop", () => {
 	});
 
 	it("stops early when major weaknesses are below the threshold", async () => {
-		const dir = await mkdtemp(join(tmpdir(), "linlic-goal-loop-stop-"));
+		const dir = await mkdtemp(join(tmpdir(), "linlic-revise-loop-stop-"));
 		const draftPath = join(dir, "paper.md");
 		await writeFile(draftPath, completeDraft, "utf8");
 
 		try {
 			const result = await runGoalReviewLoop({
 				cwd: dir,
-				input: `/goal target="投稿到目标会议" draft="${draftPath}" max_rounds=5`,
+				input: `/revise target="投稿到目标会议" draft="${draftPath}" max_rounds=5`,
 				majorIssueStopThreshold: 2,
 				timestamp: new Date(Date.UTC(2026, 0, 2, 3, 4, 5)),
 			});

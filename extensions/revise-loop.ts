@@ -1,16 +1,16 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
-import { runGoalReviewLoop } from "../src/goal-loop.ts";
+import { runGoalReviewLoop } from "../src/revise-loop.ts";
 
 export default function goalLoopExtension(pi: ExtensionAPI) {
 	pi.registerTool({
 		name: "research_goal_loop",
-		label: "Research Goal Review-Revise Loop",
+		label: "Research Review-Revise Loop",
 		description: "根据论文草稿和投稿目标执行多轮 review-revise loop，并保存每轮中间结果和最终总结。",
 		promptSnippet: "Run a bounded multi-round review-revise loop for a local paper draft and save all artifacts",
 		promptGuidelines: [
-			"Use research_goal_loop when the user invokes /goal with a target and draft path.",
-			"Never overwrite the original draft. The tool backs it up and writes revised drafts into a goal run directory.",
+			"Use research_goal_loop when the user invokes /revise with a target and draft path.",
+			"Never overwrite the original draft. The tool backs it up and writes revised drafts into a revise run directory.",
 			"Do not start an unbounded loop. maxRounds defaults to 3 and is clamped to 6.",
 		],
 		parameters: Type.Object({

@@ -1,6 +1,6 @@
 ---
 name: review-revise-loop
-description: 用于根据投稿目标执行多轮 review-revise loop，保存每轮中间结果，不自动覆盖草稿。适合 /goal 工作流。
+description: 用于根据投稿目标执行多轮 review-revise loop，保存每轮中间结果，不自动覆盖草稿。适合 /revise 工作流。
 ---
 
 # Review Revise Loop
@@ -25,7 +25,7 @@ description: 用于根据投稿目标执行多轮 review-revise loop，保存每
 
 ## 注意事项
 
-- `/goal` 应调用 `research_goal_loop`。
+- `/revise` 应调用 `research_goal_loop`。
 - 不要无限循环；`max_rounds` 默认 3，最大 6。
 - 原始草稿必须备份，不能直接覆盖原文。
 - `revised-draft.md` 是候选修改稿，需要人工确认后再合并。

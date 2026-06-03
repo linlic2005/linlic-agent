@@ -1,6 +1,6 @@
 ---
 description: 分析单篇论文 PDF 或论文文本
-argument-hint: "<PDF 路径或论文文本>"
+argument-hint: '<PDF路径> 或 path="<PDF路径>"'
 ---
 你正在执行 linlic-agent 的 `/paper` 单篇论文分析 MVP。
 
@@ -14,7 +14,7 @@ $ARGUMENTS
 
 1. 调用 `research_prepare_workspace`，确认 `research_workspace` 已创建。
 2. 如果用户提供的是 PDF 路径，调用 `research_analyze_paper_pdf`：
-   - `filePath`: 原始用户输入中的 PDF 路径。
+   - `filePath`: 原始用户输入中的 PDF 路径；支持位置参数、`path=`、`pdf=` 或 `file=`。
    - 工具会读取 PDF、抽取文本、识别标题/摘要/章节、分块，并返回受控长度的 Markdown 分析草稿。
    - 不要把 PDF 原文全文复制进上下文；只基于工具返回的 Markdown 草稿、分块摘要和可见证据生成最终报告。
 3. 如果用户提供的是论文文本或摘要而不是 PDF 路径，基于现有内容分析；如果信息不足，明确列出缺失项。

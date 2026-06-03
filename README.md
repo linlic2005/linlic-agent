@@ -13,7 +13,7 @@
 - 用 `/idea` 检查研究想法的新颖性风险和可行性。
 - 用 `/experiment` 以审稿人视角评估实验方案。
 - 用 `/review` 模拟同行评审论文草稿。
-- 用 `/goal` 生成有上限的多轮 review-revise 修改计划。
+- 用 `/revise` 生成有上限的多轮 review-revise 修改计划。
 - 用 `/citation-check` 检查引用完整性和可疑引用支持关系。
 
 默认所有研究产物保存为 Markdown，便于版本管理、人工复核和继续迭代。
@@ -27,7 +27,7 @@
 | `/idea` | 对研究想法做 novelty check、相似工作检索和可行性评估 | 研究想法查重与可行性评估报告 |
 | `/experiment` | 从审稿人角度评估实验目标、baseline、指标、消融和风险 | 实验方案评估报告 |
 | `/review` | 读取 Markdown、LaTeX 或 TXT 草稿并模拟同行评审 | 论文草稿模拟评审报告 |
-| `/goal` | 按目标执行有上限的多轮审稿、计划、候选修改和风险检查 | 多轮修改运行目录 |
+| `/revise` | 按目标执行有上限的多轮审稿、计划、候选修改和风险检查 | 多轮修改运行目录 |
 | `/citation-check` | 检查缺少引用、可疑引用支持关系、过旧引用和可补充论文 | 引用检查报告 |
 
 已实现的工具包括：
@@ -67,7 +67,7 @@ pi
 /experiment research_workspace/drafts/experiment-plan.md
 /review research_workspace/drafts/paper.md target="target venue"
 /citation-check research_workspace/drafts/paper.md
-/goal target="revise related work and experiments" draft="research_workspace/drafts/sample-draft.md" max_rounds=3
+/revise target="revise related work and experiments" draft="research_workspace/drafts/sample-draft.md" max_rounds=3
 ```
 
 ## 4. 环境变量
@@ -92,7 +92,7 @@ export ZOTERO_GROUP_ID=your_zotero_group_id
 
 ## 5. 快速开始
 
-以下是 5 个最常用命令示例：
+以下是常用命令示例：
 
 ```text
 /search topic="your research topic" limit=20 year_from=2020
@@ -115,7 +115,7 @@ export ZOTERO_GROUP_ID=your_zotero_group_id
 ```
 
 ```text
-/goal target="revise related work and experiments" draft="research_workspace/drafts/sample-draft.md" max_rounds=3
+/revise target="revise related work and experiments" draft="research_workspace/drafts/sample-draft.md" max_rounds=3
 ```
 
 ## 6. 目录结构
@@ -136,7 +136,7 @@ extensions/
   idea-check.ts
   review-draft.ts
   citation-check.ts
-  goal-loop.ts
+  revise-loop.ts
   zotero.ts
 prompts/
   search.md
@@ -145,7 +145,7 @@ prompts/
   experiment.md
   review.md
   citation-check.md
-  goal.md
+  revise.md
 skills/
   literature-search/
   paper-analysis/
@@ -162,7 +162,7 @@ src/
   idea-check.ts
   review-draft.ts
   citation-check.ts
-  goal-loop.ts
+  revise-loop.ts
   zotero.ts
 test/
 research_workspace/
@@ -198,11 +198,18 @@ research_workspace/
 - `papers/`：存放待分析的本地 PDF。
 - `notes/`：存放单篇论文分析、BibTeX 导出和阅读笔记。
 - `reports/`：存放文献检索报告、研究想法查重和可行性评估报告。
-- `reviews/`：存放实验方案评估、论文模拟评审、引用检查和 `/goal` 多轮修改目录。
+- `reviews/`：存放实验方案评估、论文模拟评审、引用检查和 `/revise` 多轮修改目录。
 - `drafts/`：存放用户论文草稿、实验方案草稿和待审查文本。
 - `logs/`：存放运行日志或后续扩展产生的诊断记录。
 
 ## 8. 每个命令的详细使用方式
+
+参数通常支持两种写法：
+
+- 位置参数：把主题或文件路径直接写在命令后，例如 `/paper research_workspace/papers/example.pdf`。
+- 键值参数：用 `key="value"` 指明含义，例如 `/review file="research_workspace/drafts/paper.md" target="target venue"`。
+
+路径可以是绝对路径，也可以是相对于当前 Pi 会话工作目录的路径。包含空格的参数建议使用英文双引号包裹。
 
 ### /search 文献检索
 
@@ -210,9 +217,16 @@ research_workspace/
 
 ```text
 /search topic="your research topic" limit=20 year_from=2020
-/search topic="your research topic" limit=20 year_from=2020
+/search "medical image anomaly detection after 2020" top 20
 /search topic="your research topic" limit=20 year_from=2020，并导出 BibTeX
 ```
+
+| 参数 | 必填 | 默认值 | 用法 |
+| --- | --- | --- | --- |
+| `topic` | 是 | 无 | 检索主题。可写 `topic="..."`，也可作为位置参数直接写在 `/search` 后。 |
+| `limit` | 否 | `10`，最大 `50` | 返回论文数量。支持 `limit=20`，也能从 `top 20`、`前 20 篇` 中推断。 |
+| `year_from` / `yearFrom` | 否 | 不限制 | 最早发表年份。支持 `year_from=2020`、`yearFrom=2020`，也能从 `since 2020`、`2020 年以来` 等表达中推断。 |
+| “导出 BibTeX” | 否 | 不导出 | 在自然语言里要求导出 BibTeX 时，prompt 会在检索后调用 `research_export_bibtex`。 |
 
 输出内容包括检索主题、关键词、英文检索式、数据源状态、Top 论文列表、方法分类、研究趋势、研究空白和下一步建议。如果用户要求导出 BibTeX，会调用 `research_export_bibtex`，保存到 `research_workspace/notes/`。
 
@@ -224,6 +238,11 @@ research_workspace/
 /paper research_workspace/papers/example.pdf
 /paper path="research_workspace/papers/sample.pdf"
 ```
+
+| 参数 | 必填 | 默认值 | 用法 |
+| --- | --- | --- | --- |
+| 文件路径 | 是 | 无 | 位置参数形式，例如 `/paper research_workspace/papers/example.pdf`。 |
+| `path` / `pdf` / `file` | 是，三选一或使用位置参数 | 无 | 键值形式的 PDF 路径，例如 `path="..."`、`pdf="..."` 或 `file="..."`。 |
 
 处理流程：
 
@@ -250,6 +269,12 @@ research_workspace/
 /idea idea="a concise description of the method, task, and expected contribution" limit=10 year_from=2020
 ```
 
+| 参数 | 必填 | 默认值 | 用法 |
+| --- | --- | --- | --- |
+| `idea` | 是 | 无 | 研究想法描述。可写 `idea="..."`，也可直接把想法写在 `/idea` 后。 |
+| `limit` | 否 | `10` | 用于检索相似工作的论文数量。 |
+| `year_from` / `yearFrom` | 否 | 不限制 | 最早发表年份，例如 `year_from=2020`。 |
+
 输出内容包括想法复述、关键词、用户 Zotero 文献库命中或未配置提示、相似工作、创新性威胁、技术可行性、数据可得性、实验成本、审稿人可能质疑和下一步行动清单。
 
 注意：`/idea` 是 novelty check / related work check，不能替代 iThenticate、Turnitin 或学校查重系统。
@@ -263,6 +288,10 @@ research_workspace/
 /experiment "Evaluate the proposed method on public benchmark datasets, compare against strong baselines, and report primary and secondary metrics."
 ```
 
+| 参数 | 必填 | 默认值 | 用法 |
+| --- | --- | --- | --- |
+| 实验方案路径或文本 | 是 | 无 | 可以是 Markdown/TXT 文件路径，也可以是直接输入的实验方案文本。 |
+
 输出内容包括实验目标、假设、数据集、baseline、指标、消融、数据泄漏风险、不公平比较风险、统计显著性、可复现性、审稿人攻击点、必须补充实验和推荐实验方案。
 
 ### /review 论文草稿模拟同行评审
@@ -270,9 +299,15 @@ research_workspace/
 `/review` 会调用 `research_review_draft`，读取 Markdown、LaTeX 或 TXT 草稿，按章节分块审查。
 
 ```text
-/review research_workspace/drafts/sample-draft.md target="target venue"
+/review research_workspace/drafts/paper.md target="target venue"
 /review research_workspace/drafts/sample-draft.tex target="journal or conference name"
 ```
+
+| 参数 | 必填 | 默认值 | 用法 |
+| --- | --- | --- | --- |
+| 文件路径 | 是 | 无 | 位置参数形式，例如 `/review research_workspace/drafts/paper.md`。 |
+| `file` / `path` / `draft` | 是，三选一或使用位置参数 | 无 | 键值形式的草稿路径，支持 Markdown、LaTeX 或 TXT。 |
+| `target` | 否 | `未指定投稿目标` | 目标会议、期刊、评分标准或修改目标，例如 `target="target venue"`。 |
 
 LaTeX 路径会启用静态项目解析增强：
 
@@ -288,9 +323,15 @@ LaTeX 路径会启用静态项目解析增强：
 `/citation-check` 会调用 `research_check_citations`，检查 Markdown 或 LaTeX 草稿中的引用风险。
 
 ```text
-/citation-check research_workspace/drafts/sample-draft.md
+/citation-check research_workspace/drafts/paper.md
 /citation-check file="research_workspace/drafts/sample-draft.tex" limit=8
 ```
+
+| 参数 | 必填 | 默认值 | 用法 |
+| --- | --- | --- | --- |
+| 文件路径 | 是 | 无 | 位置参数形式，例如 `/citation-check research_workspace/drafts/paper.md`。 |
+| `file` / `path` / `draft` | 是，三选一或使用位置参数 | 无 | 键值形式的 Markdown 或 LaTeX 草稿路径。 |
+| `limit` | 否 | `8` | 建议补充论文数量。 |
 
 输出内容包括缺少引用的位置、引用可能不支持的位置、相关工作覆盖不足的位置、过旧引用、格式问题、建议补充的新论文、BibTeX 建议和修改建议。
 
@@ -301,14 +342,21 @@ LaTeX 路径会启用静态项目解析增强：
 - 工具无法确认引用是否支持原句时，会标记为“需要人工确认”。
 - 该检查不能替代人工精读被引论文。
 
-### /goal 多轮审稿和修改循环
+### /revise 多轮审稿和修改循环
 
-`/goal` 会调用 `research_goal_loop`，根据目标和草稿路径执行有上限的 review-revise loop。默认 3 轮，`max_rounds` 最大允许 6。
+`/revise` 会调用 `research_goal_loop`，根据目标和草稿路径执行有上限的 review-revise loop。默认 3 轮，`max_rounds` 最大允许 6。
 
 ```text
-/goal target="revise related work and experiments" draft="research_workspace/drafts/sample-draft.md" max_rounds=3
-/goal target="strengthen experiments and related work" draft="research_workspace/drafts/sample-draft.tex" max_rounds=2
+/revise target="revise related work and experiments" draft="research_workspace/drafts/sample-draft.md" max_rounds=3
+/revise target="strengthen experiments and related work" draft="research_workspace/drafts/sample-draft.tex" max_rounds=2
 ```
+
+| 参数 | 必填 | 默认值 | 用法 |
+| --- | --- | --- | --- |
+| `target` | 建议填写 | `未指定目标` | 修改目标、投稿目标或验收目标，例如 `target="strengthen experiments and related work"`。 |
+| 文件路径 | 是 | 无 | 位置参数形式，例如 `/revise research_workspace/drafts/sample-draft.md`。 |
+| `draft` / `file` / `path` | 是，三选一或使用位置参数 | 无 | 键值形式的草稿路径，支持 Markdown、LaTeX 或 TXT。 |
+| `max_rounds` / `maxRounds` | 否 | `3`，最大 `6` | 最大 review-revise 轮数。超过 6 会自动截断为 6。 |
 
 每一轮会生成：
 
@@ -317,7 +365,7 @@ LaTeX 路径会启用静态项目解析增强：
 - `revised-draft.md`
 - `remaining-risks.md`
 
-`/goal` 不直接覆盖原始 draft。原始草稿会备份到运行目录，`revised-draft.md` 是候选修改稿，需要人工确认后再合并。
+`/revise` 不直接覆盖原始 draft。原始草稿会备份到运行目录，`revised-draft.md` 是候选修改稿，需要人工确认后再合并。
 
 ### Zotero 集成
 
@@ -347,14 +395,14 @@ export ZOTERO_GROUP_ID=optional_group_id
 | `/experiment` | `research_workspace/reviews/` | `experiment-review-YYYYMMDD-HHmmss.md` |
 | `/review` | `research_workspace/reviews/` | `paper-review-YYYYMMDD-HHmmss.md` |
 | `/citation-check` | `research_workspace/reviews/` | `citation-check-YYYYMMDD-HHmmss.md` |
-| `/goal` | `research_workspace/reviews/goal-YYYYMMDD-HHmmss/` | `final-summary.md` 和每轮中间文件 |
+| `/revise` | `research_workspace/reviews/revise-YYYYMMDD-HHmmss/` | `final-summary.md` 和每轮中间文件 |
 
 `research_write_report` 会自动生成安全文件名，并确保 Markdown 末尾有换行。输出 Markdown 的章节标题在 prompt 和测试中固定，便于后续自动检查。
 
-`/goal` 的运行目录结构：
+`/revise` 的运行目录结构：
 
 ```text
-research_workspace/reviews/goal-YYYYMMDD-HHmmss/
+research_workspace/reviews/revise-YYYYMMDD-HHmmss/
   config.json
   original-draft.md
   round-1/
@@ -380,9 +428,9 @@ research_workspace/reviews/goal-YYYYMMDD-HHmmss/
 
 先确认文件存在、扩展名是 `.pdf`、文件不是空文件，并且 PDF 文件头有效。如果仍提示 `PDF 无法解析` 或 `PDF 文本为空`，通常原因是扫描版 PDF、受保护 PDF、复杂版式或图片型论文。可以先用 OCR 或外部 PDF 工具转为文本，再把文本或摘要交给 `/paper` 分析。
 
-### /goal 会不会覆盖原文？
+### /revise 会不会覆盖原文？
 
-不会。`/goal` 会把原始草稿备份到 `research_workspace/reviews/goal-YYYYMMDD-HHmmss/original-draft.md`，每轮只在运行目录中生成候选 `revised-draft.md`。是否合并回正式论文，需要作者人工确认。
+不会。`/revise` 会把原始草稿备份到 `research_workspace/reviews/revise-YYYYMMDD-HHmmss/original-draft.md`，每轮只在运行目录中生成候选 `revised-draft.md`。是否合并回正式论文，需要作者人工确认。
 
 ### 查重能否替代 iThenticate？
 

@@ -1,8 +1,8 @@
 ---
-description: 根据目标生成多轮 review-revise 修改计划
-argument-hint: "<投稿目标、草稿路径和约束>"
+description: 根据目标对草稿执行多轮 review-revise 修改循环
+argument-hint: 'target="<修改或投稿目标>" draft="<草稿路径>" max_rounds=3'
 ---
-你正在执行 linlic-agent 的 `/goal` 多轮 review-revise loop MVP。
+你正在执行 linlic-agent 的 `/revise` 多轮 review-revise loop MVP。
 
 用户输入：
 
@@ -15,8 +15,8 @@ $ARGUMENTS
 1. 调用 `research_prepare_workspace`，确认 `research_workspace` 已创建。
 2. 调用 `research_goal_loop`：
    - `target`: 用户输入中的目标。
-   - `draft`: 用户输入中的草稿路径。
-   - `maxRounds`: 如果用户明确给出 `max_rounds` 或 `maxRounds`，传入对应数值。
+   - `draft`: 用户输入中的草稿路径；支持位置参数、`draft=`、`file=` 或 `path=`。
+   - `maxRounds`: 如果用户明确给出 `max_rounds` 或 `maxRounds`，传入对应数值；默认 3，最大 6。
 3. `research_goal_loop` 会执行有上限的多轮 review-revise loop：
    - 默认 3 轮，最大 6 轮。
    - 不直接覆盖原始 draft。

@@ -8,6 +8,6 @@
 6. `/search` MVP 先接 Semantic Scholar，`SEMANTIC_SCHOLAR_API_KEY` 可选，并支持无 key 公开接口或 graceful fallback。
 7. `/paper` MVP 优先使用 TypeScript 侧 PDF 文本抽取方案。
 8. `/review` 和 `/experiment` MVP 先用 prompt templates 实现。
-9. `/goal` MVP 只生成多轮修改计划，不自动覆盖草稿。
+9. `/revise` MVP 只生成多轮修改计划，不自动覆盖草稿。
 10. 所有研究输出保存到 `research_workspace` 下的 `reports`、`reviews`、`notes` 等目录。
 11. 未经用户明确确认，不开始项目开发、脚手架创建、扩展实现或大规模代码改动。

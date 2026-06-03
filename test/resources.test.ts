@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const packageRoot = new URL("..", import.meta.url).pathname;
 
-const promptNames = ["search", "paper", "idea", "experiment", "review", "goal", "citation-check"];
+const promptNames = ["search", "paper", "idea", "experiment", "review", "revise", "citation-check"];
 const readmeCommandExamples = [
 	'/search topic="your research topic" limit=20 year_from=2020',
 	"/paper research_workspace/papers/example.pdf",
@@ -12,7 +12,7 @@ const readmeCommandExamples = [
 	"/experiment research_workspace/drafts/experiment-plan.md",
 	'/review research_workspace/drafts/paper.md target="target venue"',
 	"/citation-check research_workspace/drafts/paper.md",
-	"/goal target=",
+	"/revise target=",
 ];
 const skillDirs = [
 	"literature-search",
@@ -32,7 +32,7 @@ describe("linlic-agent resources", () => {
 			const content = readFileSync(path, "utf8");
 			expect(content).toContain("research_prepare_workspace");
 			expect(content).toContain("$ARGUMENTS");
-			if (name !== "goal") expect(content).toContain("research_write_report");
+			if (name !== "revise") expect(content).toContain("research_write_report");
 		}
 	});
 
@@ -53,6 +53,26 @@ describe("linlic-agent resources", () => {
 		}
 	});
 
+	it("documents parameter usage for every slash command", () => {
+		const readme = readFileSync(join(packageRoot, "README.md"), "utf8");
+		const parameterSnippets = [
+			"| `topic` | 是 | 无 |",
+			"| `limit` | 否 | `10`，最大 `50` |",
+			"| `path` / `pdf` / `file` | 是，三选一或使用位置参数 |",
+			"| `idea` | 是 | 无 |",
+			"| 实验方案路径或文本 | 是 | 无 |",
+			"| `file` / `path` / `draft` | 是，三选一或使用位置参数 |",
+			"| `target` | 否 | `未指定投稿目标` |",
+			"| `limit` | 否 | `8` |",
+			"| `draft` / `file` / `path` | 是，三选一或使用位置参数 |",
+			"| `max_rounds` / `maxRounds` | 否 | `3`，最大 `6` |",
+		];
+
+		for (const snippet of parameterSnippets) {
+			expect(readme).toContain(snippet);
+		}
+	});
+
 	it("pins prompt output categories to stable research_workspace locations", () => {
 		const expectedPromptOutputCategories: Record<string, string> = {
 			search: "category`: `reports`",
@@ -70,10 +90,10 @@ describe("linlic-agent resources", () => {
 			expect(prompt).toContain(categorySnippet);
 		}
 
-		const goalPrompt = readFileSync(join(packageRoot, "prompts", "goal.md"), "utf8");
-		expect(goalPrompt).toContain("research_goal_loop");
-		expect(goalPrompt).toContain("final-summary.md");
-		expect(goalPrompt).toContain("原始草稿没有被覆盖");
+		const revisePrompt = readFileSync(join(packageRoot, "prompts", "revise.md"), "utf8");
+		expect(revisePrompt).toContain("research_goal_loop");
+		expect(revisePrompt).toContain("final-summary.md");
+		expect(revisePrompt).toContain("原始草稿没有被覆盖");
 	});
 
 	it("wires the paper prompt and README to the PDF analysis tool", () => {
@@ -108,13 +128,13 @@ describe("linlic-agent resources", () => {
 		expect(readme).toContain("递归读取常见 `\\input{}` 和 `\\include{}` 子文件");
 	});
 
-	it("wires the goal prompt and README to the review-revise loop tool", () => {
-		const goalPrompt = readFileSync(join(packageRoot, "prompts", "goal.md"), "utf8");
+	it("wires the revise prompt and README to the review-revise loop tool", () => {
+		const revisePrompt = readFileSync(join(packageRoot, "prompts", "revise.md"), "utf8");
 		const readme = readFileSync(join(packageRoot, "README.md"), "utf8");
 
-		expect(goalPrompt).toContain("research_goal_loop");
+		expect(revisePrompt).toContain("research_goal_loop");
 		expect(readme).toContain("research_goal_loop");
-		expect(readme).toContain("goal-YYYYMMDD-HHmmss");
+		expect(readme).toContain("revise-YYYYMMDD-HHmmss");
 		expect(readme).toContain("不直接覆盖原始 draft");
 	});
 

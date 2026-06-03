@@ -1,6 +1,6 @@
 ---
 description: 检查论文草稿引用完整性和引用支持关系
-argument-hint: "<论文草稿路径>"
+argument-hint: '<草稿路径> 或 file="<草稿路径>" limit=8'
 ---
 你正在执行 linlic-agent 的 `/citation-check` 引用检查 MVP。
 
@@ -14,8 +14,8 @@ $ARGUMENTS
 
 1. 调用 `research_prepare_workspace`，确认 `research_workspace` 已创建。
 2. 调用 `research_check_citations`：
-   - `filePath`: 用户输入中的 Markdown 或 LaTeX 草稿路径。
-   - 如果用户明确给出 `limit`，传入建议补充论文数量。
+   - `filePath`: 用户输入中的 Markdown 或 LaTeX 草稿路径；支持位置参数、`file=`、`path=` 或 `draft=`。
+   - `limit`: 如果用户明确给出 `limit`，传入建议补充论文数量；默认 8。
 3. `research_check_citations` 会读取草稿，识别 citation key，检查强论断缺少引用、可疑引用支持关系、过旧引用、格式问题，并复用 `/search` 能力寻找可补充的新论文。
 4. 不要虚构引用。工具无法确认引用是否支持原句时，必须保留“需要人工确认”标记。
 5. 检查工具返回的 Markdown 是否包含：

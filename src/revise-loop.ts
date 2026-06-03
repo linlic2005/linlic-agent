@@ -89,7 +89,7 @@ function removeKnownArguments(input: string): string {
 export function parseGoalInput(input: string): ParsedGoalInput {
 	const normalized = input
 		.trim()
-		.replace(/^\/goal\b/i, "")
+		.replace(/^\/(?:revise|goal)\b/i, "")
 		.trim();
 	const target = parseKeyValue(normalized, "target");
 	const draft =
@@ -207,7 +207,7 @@ function buildRevisedDraft(
 		"",
 		"---",
 		"",
-		`# Goal Loop Round ${round} Revised Draft Notes`,
+		`# Review-Revise Loop Round ${round} Revised Draft Notes`,
 		"",
 		"说明：这是 linlic-agent 生成的安全版 revised draft，不会覆盖原始草稿。请人工审阅后再决定是否合并到论文正文。",
 		"",
@@ -259,7 +259,7 @@ function buildFinalSummary(rounds: GoalLoopRound[], config: GoalLoopConfig, stop
 	const probability = lastRound ? formatPercent(lastRound.simulatedAcceptanceProbability) : "未知";
 	const stillRisks = lastRound?.remainingRisks ?? [];
 	return [
-		"# Goal Review-Revise Loop Final Summary",
+		"# Review-Revise Loop Final Summary",
 		"",
 		`目标：${config.target}`,
 		`总共进行了 ${rounds.length} 轮`,
@@ -293,7 +293,7 @@ function buildFinalSummary(rounds: GoalLoopRound[], config: GoalLoopConfig, stop
 		"- 人工审阅每轮 revised-draft.md，不要直接整体替换原稿。",
 		"- 将 confirmed 的修改逐项合并回正式论文。",
 		"- 对实验、引用和数学推导类修改补充真实证据。",
-		"- 合并后重新运行 `/review` 或 `/goal` 做下一轮独立检查。",
+		"- 合并后重新运行 `/review` 或 `/revise` 做下一轮独立检查。",
 	].join("\n");
 }
 
@@ -312,7 +312,7 @@ export async function runGoalReviewLoop(options: GoalLoopOptions): Promise<GoalL
 	const timestamp = options.timestamp ?? new Date();
 	const timestampText = formatTimestamp(timestamp);
 	const workspace = await ensureResearchWorkspace(options.cwd);
-	const runDir = join(workspace.directories.reviews, `goal-${timestampText}`);
+	const runDir = join(workspace.directories.reviews, `revise-${timestampText}`);
 	await mkdir(runDir, { recursive: true });
 
 	const backupPath = join(runDir, backupFilename(draftPath));

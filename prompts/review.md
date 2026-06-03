@@ -1,6 +1,6 @@
 ---
 description: 模拟同行评审论文草稿
-argument-hint: "<论文草稿路径或文本>"
+argument-hint: '<草稿路径> target="<目标会议或评审标准>"'
 ---
 你正在执行 linlic-agent 的 `/review` 论文草稿模拟同行评审 MVP。
 
@@ -14,8 +14,8 @@ $ARGUMENTS
 
 1. 调用 `research_prepare_workspace`，确认 `research_workspace` 已创建。
 2. 调用 `research_review_draft`：
-   - `filePath`: 用户输入中的 Markdown、LaTeX 或 TXT 草稿路径。
-   - `target`: 如果用户明确给出 `target`，传入目标会议、期刊或评审标准。
+   - `filePath`: 用户输入中的 Markdown、LaTeX 或 TXT 草稿路径；支持位置参数、`file=`、`path=` 或 `draft=`。
+   - `target`: 如果用户明确给出 `target`，传入目标会议、期刊或评审标准；未给出时使用工具默认目标。
 3. `research_review_draft` 会读取草稿、识别 Markdown/LaTeX 章节，并在文本较长时按章节分块审查。LaTeX 草稿会额外返回子文件、宏、公式、图表、表格、附录、引用和解析 warning。若 Zotero 已配置，工具会额外检索用户文献库，给出引用和相关工作完整性提示。不要把原始草稿全文一次性塞进上下文。
 4. 检查工具返回的 Markdown 是否包含：
    - `# 论文草稿模拟评审报告`

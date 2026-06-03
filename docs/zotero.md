@@ -1,6 +1,6 @@
 # Zotero 集成使用说明
 
-`linlic-agent` 的 Zotero 集成基于 Zotero Web API v3。它只在用户配置环境变量后启用；未配置时，`/search`、`/idea`、`/review`、`/paper` 和 `/goal` 仍会照常运行。
+`linlic-agent` 的 Zotero 集成基于 Zotero Web API v3。它只在用户配置环境变量后启用；未配置时，`/search`、`/idea`、`/review`、`/paper` 和 `/revise` 仍会照常运行。
 
 ## 环境变量
 

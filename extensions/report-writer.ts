@@ -14,7 +14,7 @@ export default function reportWriterExtension(pi: ExtensionAPI) {
 		promptGuidelines: [
 			"Use research_write_report after generating a linlic-agent research report, review, note, or log.",
 			"Use research_write_report with category=reports for literature search, paper analysis, and idea reports.",
-			"Use research_write_report with category=reviews for experiment reviews, paper reviews, and goal plans.",
+			"Use research_write_report with category=reviews for experiment reviews, paper reviews, and review-revise plans.",
 		],
 		parameters: Type.Object({
 			category: StringEnum(reportCategories, { description: "保存目录分类" }),
